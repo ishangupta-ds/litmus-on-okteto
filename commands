@@ -1,0 +1,8 @@
+yaml_file="litmus-portal-k8s.yaml"
+key="namespace"
+new_value="ishangupta-ds"
+
+sed -r "s/^(\s*${key}\s*:\s*).*/\1${new_value}/" -i "$yaml_file"
+sed -e 's|"litmus"|"ishangupta-ds"|g' litmus-portal-k8s.yaml
+sed -e 's|name: litmus |name: ishangupta-ds|g' litmus-portal-k8s.yaml
+sed -e 's|namespace: litmus|namespace: ishangupta-ds|g' hacktoberfest-litmusportal.yaml
