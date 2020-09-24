@@ -1,0 +1,205 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: litmus-portal-okteto-config
+data:
+  oktetoNamespace: ishangupta-ds
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: litmusportal-frontend
+  namespace: ishangupta-ds
+  labels:
+    component: litmusportal-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: litmusportal-frontend
+  template:
+    metadata:
+      labels:
+        component: litmusportal-frontend
+    spec:
+      containers:
+        - name: litmusportal-frontend
+          image: litmuschaos/litmusportal-frontend:ci
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: litmusportal-frontend-service
+  namespace: ishangupta-ds
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 9091
+      targetPort: 80
+  selector:
+    component: litmusportal-frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: litmusportal-server
+  namespace: ishangupta-ds
+  labels:
+    component: litmusportal-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: litmusportal-server
+  template:
+    metadata:
+      labels:
+        component: litmusportal-server
+    spec:
+      containers:
+        - name: graphql-server
+          image: ishanguptads/litmusportal-server:final
+          env:
+            - name: DB_SERVER
+              value: "mongo-service:27017"
+            - name: JWT_SECRET
+              value: "litmus-portal@123"
+            - name: EXTERNAL_ADDRESS
+              value: ""
+            - name: SERVICE_ADDRESS
+              value: "http://litmusportal-server-service:9002"
+            - name: SELF_CLUSTER
+              value: "true"
+            - name: SUBSCRIBER_IMAGE
+              value: "ishanguptads/litmusportal-subscriber:final"
+            - name: SUBSCRIBER_NAMESPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: litmus-portal-okteto-config
+                  key: oktetoNamespace
+            - name: DEPLOYER_IMAGE
+              value: "ishanguptads/litmusportal-self-deployer:final"
+            - name: DEPLOYER_NAMESPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: litmus-portal-okteto-config
+                  key: oktetoNamespace
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+        - name: auth-server
+          image: litmuschaos/litmusportal-auth-server:ci
+          env:
+            - name: DB_SERVER
+              value: "mongodb://mongo-service:27017"
+            - name: JWT_SECRET
+              value: "litmus-portal@123"
+            - name: ADMIN_USERNAME
+              value: "admin"
+            - name: ADMIN_PASSWORD
+              value: "litmus"
+          ports:
+            - containerPort: 3000
+          imagePullPolicy: Always
+      serviceAccountName: litmus-svc-account
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: litmusportal-server-service
+  namespace: ishangupta-ds
+spec:
+  type: ClusterIP
+  ports:
+    - name: graphql-server
+      port: 9002
+      targetPort: 8080
+    - name: auth-server
+      port: 9003
+      targetPort: 3000
+  selector:
+    component: litmusportal-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: ishangupta-ds
+  labels:
+    app: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: database
+  template:
+    metadata:
+      labels:
+        component: database
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:4.2.8
+          ports:
+            - containerPort: 27017
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-persistent-storage
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pv-claim
+  namespace: ishangupta-ds
+  labels:
+    app: mongo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo
+  name: mongo-service
+  namespace: ishangupta-ds
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    component: database
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: litmus-svc-account
+  namespace: ishangupta-ds
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: litmus-rb
+  namespace: ishangupta-ds
+subjects:
+  - kind: ServiceAccount
+    name: litmus-svc-account
+    namespace: ishangupta-ds
+roleRef:
+  kind: Role
+  name: namespace-admin
+  apiGroup: rbac.authorization.k8s.io
