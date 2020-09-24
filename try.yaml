@@ -55,7 +55,7 @@ spec:
     spec:
       containers:
         - name: graphql-server
-          image: ishanguptads/litmusportal-server:hf
+          image: ishanguptads/litmusportal-server:latest
           env:
             - name: DB_SERVER
               value: "mongo-service:27017"
