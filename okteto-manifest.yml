@@ -1,11 +1,3 @@
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: litmus-portal-okteto-config
-data:
-  oktetoNamespace: ishangupta-ds
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -78,17 +70,11 @@ spec:
             - name: SUBSCRIBER_IMAGE
               value: "ishanguptads/litmusportal-subscriber:final"
             - name: SUBSCRIBER_NAMESPACE
-              valueFrom:
-                configMapKeyRef:
-                  name: litmus-portal-okteto-config
-                  key: oktetoNamespace
+              value: ishangupta-ds
             - name: DEPLOYER_IMAGE
               value: "ishanguptads/litmusportal-self-deployer:final"
             - name: DEPLOYER_NAMESPACE
-              valueFrom:
-                configMapKeyRef:
-                  name: litmus-portal-okteto-config
-                  key: oktetoNamespace
+              value: ishangupta-ds
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
