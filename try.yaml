@@ -178,7 +178,7 @@ metadata:
   namespace: ishangupta-ds
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: litmus-rb
   namespace: ishangupta-ds
@@ -187,6 +187,6 @@ subjects:
     name: litmus-svc-account
     namespace: ishangupta-ds
 roleRef:
-  kind: ClusterRole
-  name: cluster-admin
+  kind: Role
+  name: namespace-admin
   apiGroup: rbac.authorization.k8s.io
