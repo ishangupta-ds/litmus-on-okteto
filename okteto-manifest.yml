@@ -5,6 +5,7 @@ metadata:
   name: litmus-portal-okteto-config
 data:
   oktetoNamespace: ishangupta-ds
+  scope: namespace
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -85,6 +86,11 @@ spec:
               value: "true"
             - name: SUBSCRIBER_IMAGE
               value: "ishanguptads/litmusportal-subscriber:final"
+            - name: SUBSCRIBER_SCOPE
+              valueFrom:
+                configMapKeyRef:
+                  name: litmus-portal-okteto-config
+                  key: scope
             - name: SUBSCRIBER_NAMESPACE
               valueFrom:
                 configMapKeyRef:
