@@ -26,6 +26,13 @@ spec:
       containers:
         - name: litmusportal-frontend
           image: litmuschaos/litmusportal-frontend:ci
+          resources:
+            limits:
+              cpu: 750m
+              memory: 1000Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -64,6 +71,13 @@ spec:
       containers:
         - name: graphql-server
           image: ishanguptads/litmusportal-server:final
+          resources:
+            limits:
+              cpu: 750m
+              memory: 200Mi
+            requests:
+              cpu: 500m
+              memory: 100Mi
           env:
             - name: DB_SERVER
               value: "mongo-service:27017"
@@ -94,6 +108,13 @@ spec:
           imagePullPolicy: Always
         - name: auth-server
           image: litmuschaos/litmusportal-auth-server:ci
+          resources:
+            limits:
+              cpu: 250m
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
           env:
             - name: DB_SERVER
               value: "mongodb://mongo-service:27017"
@@ -145,6 +166,13 @@ spec:
       containers:
         - name: mongo
           image: mongo:4.2.8
+          resources:
+            limits:
+              cpu: 250m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 250Mi
           ports:
             - containerPort: 27017
           imagePullPolicy: Always
