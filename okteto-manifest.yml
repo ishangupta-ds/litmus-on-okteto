@@ -97,7 +97,7 @@ spec:
                   name: litmus-portal-okteto-config
                   key: oktetoNamespace
             - name: DEPLOYER_IMAGE
-              value: "ishanguptads/litmusportal-self-deployer:final"
+              value: "ishanguptads/litmusportal-self-deployer:it"
             - name: DEPLOYER_NAMESPACE
               valueFrom:
                 configMapKeyRef:
