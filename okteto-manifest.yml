@@ -2,9 +2,10 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: litmus-portal-okteto-config
+  name: litmus-portal-operations-config
 data:
-  oktetoNamespace: ishangupta-ds
+  subscriberNamespace: ishangupta-ds
+  workflowNamespace: ishangupta-ds
   subscriberScope: namespace
   workflowScope:  namespace
 ---
@@ -124,25 +125,30 @@ spec:
             - name: SUBSCRIBER_SCOPE
               valueFrom:
                 configMapKeyRef:
-                  name: litmus-portal-okteto-config
+                  name: litmus-portal-operations-config
                   key: subscriberScope
             - name: WORKFLOW_SCOPE
               valueFrom:
                 configMapKeyRef:
-                  name: litmus-portal-okteto-config
+                  name: litmus-portal-operations-config
                   key: workflowScope
             - name: SUBSCRIBER_NAMESPACE
               valueFrom:
                 configMapKeyRef:
-                  name: litmus-portal-okteto-config
-                  key: oktetoNamespace
+                  name: litmus-portal-operations-config
+                  key: subscriberNamespace
+            - name: WORKFLOW_NAMESPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: litmus-portal-operations-config
+                  key: workflowNamespace
             - name: DEPLOYER_IMAGE
               value: "ishanguptads/litmusportal-self-deployer:it"
             - name: DEPLOYER_NAMESPACE
               valueFrom:
                 configMapKeyRef:
-                  name: litmus-portal-okteto-config
-                  key: oktetoNamespace
+                  name: litmus-portal-operations-config
+                  key: subscriberNamespace
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
