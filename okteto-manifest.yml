@@ -32,8 +32,8 @@ spec:
           image: litmuschaos/litmusportal-frontend:ci
           resources:
             limits:
-              cpu: 500m
-              memory: 750Mi
+              cpu: 400m
+              memory: 400Mi
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -109,8 +109,8 @@ spec:
           image: ishanguptads/litmusportal-server:testing
           resources:
             limits:
-              cpu: 500m
-              memory: 500Mi
+              cpu: 400m
+              memory: 400Mi
           env:
             - name: DB_SERVER
               value: "mongo-service:27017"
@@ -159,7 +159,7 @@ spec:
           resources:
             limits:
               cpu: 250m
-              memory: 500Mi
+              memory: 250Mi
           env:
             - name: DB_SERVER
               value: "mongodb://mongo-service:27017"
@@ -214,7 +214,7 @@ spec:
           resources:
             limits:
               cpu: 250m
-              memory: 500Mi
+              memory: 400Mi
           ports:
             - containerPort: 27017
           imagePullPolicy: Always
