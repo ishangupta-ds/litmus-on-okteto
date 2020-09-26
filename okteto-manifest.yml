@@ -102,7 +102,7 @@ spec:
     spec:
       containers:
         - name: graphql-server
-          image: ishanguptads/litmusportal-server:yi
+          image: ishanguptads/litmusportal-se:yi
           resources:
             limits:
               cpu: 500m
