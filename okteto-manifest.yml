@@ -5,7 +5,8 @@ metadata:
   name: litmus-portal-okteto-config
 data:
   oktetoNamespace: ishangupta-ds
-  scope: namespace
+  subscriberScope: namespace
+  workflowScope:  namespace
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -119,12 +120,17 @@ spec:
             - name: SELF_CLUSTER
               value: "true"
             - name: SUBSCRIBER_IMAGE
-              value: "ishanguptads/litmusportal-subscriber:final"
+              value: "ishanguptads/litmusportal-subscriber:testing"
             - name: SUBSCRIBER_SCOPE
               valueFrom:
                 configMapKeyRef:
                   name: litmus-portal-okteto-config
-                  key: scope
+                  key: subscriberScope
+            - name: WORKFLOW_SCOPE
+              valueFrom:
+                configMapKeyRef:
+                  name: litmus-portal-okteto-config
+                  key: workflowScope
             - name: SUBSCRIBER_NAMESPACE
               valueFrom:
                 configMapKeyRef:
