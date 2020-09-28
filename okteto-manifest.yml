@@ -5,10 +5,10 @@ metadata:
   name: litmus-portal-operations-config
   namespace: ishangupta-ds
 data:
-  subscriberNamespace: ishangupta-ds
+  portalNamespace: ishangupta-ds
   workflowNamespace: ishangupta-ds
   subscriberScope: namespace
-  workflowScope:  namespace
+  workflowScope: namespace
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -66,6 +66,24 @@ metadata:
   labels:
     name: namespace-admin
 rules:
+  - apiGroups:
+      - argoproj.io
+    resources:
+      - workflows
+      - workflows/finalizers
+      - workflowtemplates
+      - workflowtemplates/finalizers
+      - cronworkflows
+      - cronworkflows/finalizers
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
   - apiGroups:
       - "*"
     resources:
