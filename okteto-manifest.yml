@@ -5,7 +5,7 @@ metadata:
   name: litmus-portal-operations-config
   namespace: ishangupta-ds
 data:
-  portalNamespace: ishangupta-ds
+  subscriberNamespace: ishangupta-ds
   workflowNamespace: ishangupta-ds
   subscriberScope: namespace
   workflowScope: namespace
