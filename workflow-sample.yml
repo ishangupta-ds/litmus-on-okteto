@@ -98,7 +98,7 @@ spec:
                       name: pod-delete
       container:
         image: lachlanevenson/k8s-kubectl
-        resources:                # limit the resources
+        resources:
           limits:
             memory: 128Mi
             cpu: 100m
@@ -143,7 +143,7 @@ spec:
                               value: "false"
       container:
         image: litmuschaos/litmus-checker:latest
-        resources:                # limit the resources
+        resources:
           limits:
             memory: 128Mi
             cpu: 100m
