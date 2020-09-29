@@ -98,6 +98,10 @@ spec:
                       name: pod-delete
       container:
         image: lachlanevenson/k8s-kubectl
+        resources:                # limit the resources
+          limits:
+            memory: 128Mi
+            cpu: 100m
         command:
           - sh
           - -c
@@ -139,6 +143,10 @@ spec:
                               value: "false"
       container:
         image: litmuschaos/litmus-checker:latest
+        resources:                # limit the resources
+          limits:
+            memory: 128Mi
+            cpu: 100m
         args:
           - -file=/tmp/chaosengine.yaml
           - -saveName=/tmp/engine-name
