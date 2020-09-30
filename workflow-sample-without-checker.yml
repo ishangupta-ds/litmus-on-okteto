@@ -22,7 +22,7 @@ spec:
 
     - name: run-chaos
       suspend:
-        duration: "30"
+        duration: "40"
 
     - name: initialize-engine
       inputs:
@@ -68,7 +68,7 @@ spec:
         command: [sh, -c]
         args:
           [
-            "kubectl apply -f /tmp/chaosengine.yaml -n {{workflow.parameters.adminModeNamespace}} | sleep 30",
+            "kubectl apply -f /tmp/chaosengine.yaml -n {{workflow.parameters.adminModeNamespace}}",
           ]
 
     - name: revert-chaos
@@ -81,5 +81,5 @@ spec:
         command: [sh, -c]
         args:
           [
-            " sleep 20 | kubectl delete chaosengine pod-delete-chaos -n {{workflow.parameters.adminModeNamespace}}",
+            "kubectl delete chaosengine pod-delete-chaos -n {{workflow.parameters.adminModeNamespace}}",
           ]
