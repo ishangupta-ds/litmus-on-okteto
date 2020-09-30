@@ -24,15 +24,6 @@ spec:
       suspend:
         duration: "120"
 
-    - name: revert-chaos
-      container:
-        image: lachlanevenson/k8s-kubectl
-        command: [sh, -c]
-        args:
-          [
-            " sleep 20 | kubectl delete chaosengine pod-delete-chaos -n {{workflow.parameters.adminModeNamespace}}",
-          ]
-
     - name: run-chaos
       inputs:
         artifacts:
@@ -76,4 +67,13 @@ spec:
         args:
           [
             "kubectl apply -f /tmp/chaosengine.yaml -n {{workflow.parameters.adminModeNamespace}}",
+          ]
+
+    - name: revert-chaos
+      container:
+        image: lachlanevenson/k8s-kubectl
+        command: [sh, -c]
+        args:
+          [
+            " sleep 20 | kubectl delete chaosengine pod-delete-chaos -n {{workflow.parameters.adminModeNamespace}}",
           ]
