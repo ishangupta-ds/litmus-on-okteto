@@ -5,10 +5,8 @@ metadata:
   name: litmus-portal-operations-config
   namespace: ishangupta-ds
 data:
-  subscriberNamespace: ishangupta-ds
-  workflowNamespace: ishangupta-ds
-  subscriberScope: namespace
-  workflowScope: namespace
+  K8s-mode: namespace
+  SubscriberNamespace: ishangupta-ds
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -55,16 +53,103 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: litmus-svc-account
+  name: self-deployer-admin-account
+  namespace: ishangupta-ds
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: deployer-admin
+  namespace: ishangupta-ds
+  labels:
+    name: deployer-admin
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - customresourcedefinitions
+      - serviceaccounts
+      - roles
+      - clusterroles
+      - rolebindings
+      - clusterrolebindings
+      - configmaps
+      - deployments
+      - pods
+    verbs:
+      - "create"
+      - "delete"
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: deployer-admin-rb
+  namespace: ishangupta-ds
+subjects:
+  - kind: ServiceAccount
+    name: self-deployer-admin-account
+    namespace: ishangupta-ds
+roleRef:
+  kind: ClusterRole
+  name: deployer-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: self-deployer-namespace-account
   namespace: ishangupta-ds
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name: namespace-admin
+  name: deployer-namespace
   namespace: ishangupta-ds
   labels:
-    name: namespace-admin
+    name: deployer-namespace
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - serviceaccounts
+      - roles
+      - rolebindings
+      - configmaps
+      - deployments
+      - pods
+    verbs:
+      - "create"
+      - "delete"
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: deployer-namespace-rb
+  namespace: ishangupta-ds
+subjects:
+  - kind: ServiceAccount
+    name: self-deployer-namespace-account
+    namespace: ishangupta-ds
+roleRef:
+  kind: Role
+  name: deployer-namespace
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: subscriber-service-account
+  namespace: ishangupta-ds
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: subscriber-namespace
+  namespace: ishangupta-ds
+  labels:
+    name: subscriber-namespace
 rules:
   - apiGroups:
       - argoproj.io
@@ -77,32 +162,22 @@ rules:
       - cronworkflows/finalizers
     verbs:
       - create
-      - delete
-      - deletecollection
       - get
       - list
-      - patch
-      - update
       - watch
-  - apiGroups:
-      - "*"
-    resources:
-      - "*"
-    verbs:
-      - "*"
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: litmus-rb
+  name: subscriber-namespace-rb
   namespace: ishangupta-ds
 subjects:
   - kind: ServiceAccount
-    name: litmus-svc-account
+    name: subscriber-service-account
     namespace: ishangupta-ds
 roleRef:
   kind: Role
-  name: namespace-admin
+  name: subscriber-namespace
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: apps/v1
@@ -146,22 +221,22 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: litmus-portal-operations-config
-                  key: subscriberScope
+                  key: K8s-mode
             - name: WORKFLOW_SCOPE
               valueFrom:
                 configMapKeyRef:
                   name: litmus-portal-operations-config
-                  key: workflowScope
+                  key: K8s-mode
             - name: SUBSCRIBER_NAMESPACE
               valueFrom:
                 configMapKeyRef:
                   name: litmus-portal-operations-config
-                  key: subscriberNamespace
+                  key: SubscriberNamespace
             - name: WORKFLOW_NAMESPACE
               valueFrom:
                 configMapKeyRef:
                   name: litmus-portal-operations-config
-                  key: workflowNamespace
+                  key: SubscriberNamespace
             - name: DEPLOYER_IMAGE
               value: "ishanguptads/litmusportal-self-deployer:private"
             - name: DEPLOYER_NAMESPACE
