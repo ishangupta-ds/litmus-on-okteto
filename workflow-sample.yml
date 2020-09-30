@@ -15,6 +15,11 @@ spec:
       steps:
         - - name: run-chaos
             template: run-chaos
+        - - name: initializing
+            template: delay
+    - name: delay
+      suspend:
+        duration: "20"
     - name: run-chaos
       inputs:
         artifacts:
