@@ -1,18 +1,23 @@
 ---
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: litmus
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: litmus-portal-operations-config
-  namespace: ishangupta-ds
+  namespace: litmus
 data:
   K8s-mode: namespace
-  SubscriberNamespace: ishangupta-ds
+  SubscriberNamespace: litmus
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: litmusportal-frontend
-  namespace: ishangupta-ds
+  namespace: litmus
   labels:
     component: litmusportal-frontend
 spec:
@@ -40,7 +45,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: litmusportal-frontend-service
-  namespace: ishangupta-ds
+  namespace: litmus
 spec:
   type: NodePort
   ports:
@@ -53,14 +58,59 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: self-deployer-admin-account
+  namespace: litmus
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: deployer-admin
+  namespace: litmus
+  labels:
+    name: deployer-admin
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - customresourcedefinitions
+      - serviceaccounts
+      - roles
+      - clusterroles
+      - rolebindings
+      - clusterrolebindings
+      - configmaps
+      - deployments
+      - pods
+    verbs:
+      - "create"
+      - "delete"
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: deployer-admin-rb
+  namespace: litmus
+subjects:
+  - kind: ServiceAccount
+    name: self-deployer-admin-account
+    namespace: litmus
+roleRef:
+  kind: ClusterRole
+  name: deployer-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: self-deployer-namespace-account
-  namespace: ishangupta-ds
+  namespace: litmus
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: deployer-namespace
-  namespace: ishangupta-ds
+  namespace: litmus
   labels:
     name: deployer-namespace
 rules:
@@ -82,11 +132,11 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: deployer-namespace-rb
-  namespace: ishangupta-ds
+  namespace: litmus
 subjects:
   - kind: ServiceAccount
     name: self-deployer-namespace-account
-    namespace: ishangupta-ds
+    namespace: litmus
 roleRef:
   kind: Role
   name: deployer-namespace
@@ -96,13 +146,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: subscriber-service-account
-  namespace: ishangupta-ds
+  namespace: litmus
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: subscriber-namespace
-  namespace: ishangupta-ds
+  namespace: litmus
   labels:
     name: subscriber-namespace
 rules:
@@ -125,11 +175,11 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: subscriber-namespace-rb
-  namespace: ishangupta-ds
+  namespace: litmus
 subjects:
   - kind: ServiceAccount
     name: subscriber-service-account
-    namespace: ishangupta-ds
+    namespace: litmus
 roleRef:
   kind: Role
   name: subscriber-namespace
@@ -139,7 +189,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: litmusportal-server
-  namespace: ishangupta-ds
+  namespace: litmus
   labels:
     component: litmusportal-server
 spec:
@@ -226,7 +276,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: litmusportal-server-service
-  namespace: ishangupta-ds
+  namespace: litmus
 spec:
   type: ClusterIP
   ports:
@@ -243,7 +293,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongo
-  namespace: ishangupta-ds
+  namespace: litmus
   labels:
     app: mongo
 spec:
@@ -278,7 +328,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongo-pv-claim
-  namespace: ishangupta-ds
+  namespace: litmus
   labels:
     app: mongo
 spec:
@@ -286,7 +336,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 4Gi
+      storage: 20Gi
 ---
 apiVersion: v1
 kind: Service
@@ -294,7 +344,7 @@ metadata:
   labels:
     app: mongo
   name: mongo-service
-  namespace: ishangupta-ds
+  namespace: litmus
 spec:
   ports:
     - port: 27017
