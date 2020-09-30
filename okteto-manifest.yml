@@ -243,7 +243,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: litmus-portal-operations-config
-                  key: subscriberNamespace
+                  key: SubscriberNamespace
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
