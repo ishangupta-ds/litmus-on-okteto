@@ -15,11 +15,24 @@ spec:
       steps:
         - - name: run-chaos
             template: run-chaos
-        #- - name: initializing #uncomment to add a step
-        #template: initializing #uncomment to add a template to the step
-    - name: initializing
+        - - name: waiting
+            template: waiting
+        - - name: revert-chaos
+            template: revert-chaos
+
+    - name: waiting
       suspend:
-        duration: "20"
+        duration: "120"
+
+    - name: revert-chaos
+      container:
+        image: lachlanevenson/k8s-kubectl
+        command: [sh, -c]
+        args:
+          [
+            " sleep 20 | kubectl delete chaosengine pod-delete-chaos -n {{workflow.parameters.adminModeNamespace}}",
+          ]
+
     - name: run-chaos
       inputs:
         artifacts:
@@ -62,5 +75,5 @@ spec:
         command: [sh, -c]
         args:
           [
-            'kubectl apply -f /tmp/chaosengine.yaml -n {{workflow.parameters.adminModeNamespace}} | echo "sleeping for 100s" | sleep 100 ',
+            "kubectl apply -f /tmp/chaosengine.yaml -n {{workflow.parameters.adminModeNamespace}}",
           ]
