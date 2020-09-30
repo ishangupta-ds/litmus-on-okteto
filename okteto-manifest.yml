@@ -95,44 +95,39 @@ roleRef:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: subscriber-service-account
+  name: litmus-server-account
   namespace: ishangupta-ds
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name: subscriber-namespace
+  name: litmus-server
   namespace: ishangupta-ds
   labels:
-    name: subscriber-namespace
+    name: litmus-server
 rules:
   - apiGroups:
-      - argoproj.io
+      - ""
     resources:
-      - workflows
-      - workflows/finalizers
-      - workflowtemplates
-      - workflowtemplates/finalizers
-      - cronworkflows
-      - cronworkflows/finalizers
+      - pods
+      - pods/exec
     verbs:
       - create
-      - get
-      - list
-      - watch
+      - patch
+      - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: subscriber-namespace-rb
+  name: litmus-server-rb
   namespace: ishangupta-ds
 subjects:
   - kind: ServiceAccount
-    name: subscriber-service-account
+    name: litmus-server-account
     namespace: ishangupta-ds
 roleRef:
   kind: Role
-  name: subscriber-namespace
+  name: litmus-server
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: apps/v1
@@ -220,7 +215,7 @@ spec:
           ports:
             - containerPort: 3000
           imagePullPolicy: Always
-      serviceAccountName: litmus-svc-account
+      serviceAccountName: litmus-server-account
 ---
 apiVersion: v1
 kind: Service
