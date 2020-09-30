@@ -18,7 +18,7 @@ spec:
           image: nginx:1.16.1
           resources:
             limits:
-              cpu: 100m
+              cpu: 50m
               memory: 200Mi
           ports:
             - containerPort: 80
