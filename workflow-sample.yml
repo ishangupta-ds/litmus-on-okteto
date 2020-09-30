@@ -15,9 +15,9 @@ spec:
       steps:
         - - name: run-chaos
             template: run-chaos
-        - - name: initializing
-            template: delay
-    - name: delay
+        #- - name: initializing #uncomment to add a step
+            #template: initializing #uncomment to add a template to the step
+    - name: initializing
       suspend:
         duration: "20"
     - name: run-chaos
