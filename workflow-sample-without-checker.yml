@@ -13,21 +13,21 @@ spec:
   templates:
     - name: argowf-chaos
       steps:
+        - - name: initialize-engine
+            template: initialize-engine
         - - name: run-chaos
             template: run-chaos
-        - - name: waiting
-            template: waiting
         - - name: revert-chaos
             template: revert-chaos
 
-    - name: waiting
-      suspend:
-        duration: "120"
-
     - name: run-chaos
+      suspend:
+        duration: "30"
+
+    - name: initialize-engine
       inputs:
         artifacts:
-          - name: run-chaos
+          - name: initialize-engine
             path: /tmp/chaosengine.yaml
             raw:
               data: |
@@ -39,11 +39,11 @@ spec:
                 spec:
                   appinfo:
                     appns: ishangupta-ds
-                    applabel: "app=nginx"
+                    applabel: 'app=hello-world'
                     appkind: deployment
                   jobCleanUpPolicy: retain
                   monitoring: false
-                  annotationCheck: 'false'
+                  annotationCheck: 'true'
                   engineState: 'active'
                   chaosServiceAccount: litmus-namespace-admin
                   experiments:
@@ -51,8 +51,10 @@ spec:
                       spec:
                         components:
                           env:
+                            - name: KILL_COUNT
+                              value: '1'
                             - name: TOTAL_CHAOS_DURATION
-                              value: "60"
+                              value: "30"
                             - name: CHAOS_INTERVAL
                               value: "10"
                             - name: FORCE
@@ -66,7 +68,7 @@ spec:
         command: [sh, -c]
         args:
           [
-            "kubectl apply -f /tmp/chaosengine.yaml -n {{workflow.parameters.adminModeNamespace}}",
+            "kubectl apply -f /tmp/chaosengine.yaml -n {{workflow.parameters.adminModeNamespace}} | sleep 30",
           ]
 
     - name: revert-chaos
