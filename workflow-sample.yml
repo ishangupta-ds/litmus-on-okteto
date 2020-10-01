@@ -35,7 +35,7 @@ spec:
                 spec:
                   appinfo:
                     appns: ishangupta-ds
-                    applabel: "k8s-app=nginx"
+                    applabel: 'app=hello-world'
                     appkind: deployment
                   jobCleanUpPolicy: retain
                   monitoring: false
