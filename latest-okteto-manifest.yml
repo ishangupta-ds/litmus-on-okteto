@@ -175,7 +175,7 @@ spec:
     spec:
       containers:
         - name: graphql-server
-          image: litmuschaos/litmusportal-server:ci
+          image: ishanguptads/litmusportal-server:private
           resources:
             limits:
               cpu: 200m
@@ -198,7 +198,7 @@ spec:
             - name: SELF_CLUSTER
               value: "true"
             - name: SUBSCRIBER_IMAGE
-              value: "litmuschaos/litmusportal-subscriber:ci"
+              value: "ishanguptads/litmusportal-subscriber:private"
             - name: SUBSCRIBER_SCOPE
               valueFrom:
                 configMapKeyRef:
@@ -220,7 +220,7 @@ spec:
                   name: litmus-portal-admin-config
                   key: SubscriberNamespace
             - name: DEPLOYER_IMAGE
-              value: "litmuschaos/litmusportal-self-deployer:ci"
+              value: "ishanguptads/litmusportal-self-deployer:private"
             - name: DEPLOYER_NAMESPACE
               valueFrom:
                 configMapKeyRef:
