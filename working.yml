@@ -1,0 +1,82 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: ishangupta-ds
+  name: argowf-chaos-hello-world-pod-delete-
+spec:
+  entrypoint: argowf-chaos
+  serviceAccountName: argo-chaos
+  arguments:
+    parameters:
+      - name: adminModeNamespace
+        value: ishangupta-ds
+  templates:
+    - name: argowf-chaos
+      steps:
+        - - name: run-chaos
+            template: run-chaos
+        - - name: revert-chaos
+            template: revert-chaos
+
+    - name: revert-chaos
+      container:
+        image: lachlanevenson/k8s-kubectl
+        resources:
+          limits:
+            memory: 128Mi
+            cpu: 50m
+        command: [sh, -c]
+        args: 
+          - "kubectl delete chaosengine pod-delete-chaos -n {{workflow.parameters.adminModeNamespace}}"
+
+    - name: run-chaos
+      inputs:
+        artifacts:
+          - name: run-chaos
+            path: /tmp/chaosengine.yaml
+            raw:
+              data: |
+                apiVersion: litmuschaos.io/v1alpha1
+                kind: ChaosEngine
+                metadata:
+                  name: pod-delete-chaos
+                  namespace: {{workflow.parameters.adminModeNamespace}}
+                spec:
+                  appinfo:
+                    appns: ishangupta-ds
+                    applabel: 'app=hello-world'
+                    appkind: deployment
+                  jobCleanUpPolicy: retain
+                  monitoring: false
+                  annotationCheck: 'false'
+                  engineState: 'active'
+                  chaosServiceAccount: litmus-namespace-admin
+                  experiments:
+                    - name: pod-delete
+                      spec:
+                        components:
+                          resources:
+                            requests:
+                              memory: 128Mi
+                              cpu: 50m
+                            limits:
+                              memory: 128Mi
+                              cpu: 50m
+                          env:
+                            - name: TOTAL_CHAOS_DURATION
+                              value: "30"
+                            - name: CHAOS_INTERVAL
+                              value: "10"
+                            - name: FORCE
+                              value: "false"
+      container:
+        image: litmuschaos/litmus-checker:latest
+        resources:
+          limits:
+            memory: 128Mi
+            cpu: 50m
+        args:
+          - -file=/tmp/chaosengine.yaml
+          - -saveName=/tmp/engine-name
+
+      
