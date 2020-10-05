@@ -272,8 +272,6 @@ kind: Service
 metadata:
   name: litmusportal-server-service
   namespace: ishangupta-ds
-  annotations:
-    dev.okteto.com/auto-ingress: "true"
 spec:
   type: ClusterIP
   ports:
@@ -352,27 +350,27 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: litmusportal-backend
+  name: litmusportal-production-frontend
   namespace: ishangupta-ds
   labels:
-    component: litmusportal-backend
+    component: litmusportal-production-frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      component: litmusportal-backend
+      component: litmusportal-production-frontend
   template:
     metadata:
       labels:
-        component: litmusportal-backend
+        component: litmusportal-production-frontend
     spec:
       containers:
-        - name: litmusportal-backend
+        - name: litmusportal-production-frontend
           image: litmuschaos/litmusportal-frontend:ci
           resources:
             limits:
-              cpu: 100m
-              memory: 200Mi
+              cpu: 200m
+              memory: 400Mi
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -380,7 +378,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: litmusportal-backend-service
+  name: litmusportal-production-frontend-service
   namespace: ishangupta-ds
   annotations:
     dev.okteto.com/auto-ingress: "true"
@@ -391,4 +389,4 @@ spec:
       port: 9091
       targetPort: 80
   selector:
-    component: litmusportal-backend
+    component: litmusportal-production-frontend
