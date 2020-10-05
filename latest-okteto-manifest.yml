@@ -348,3 +348,47 @@ spec:
       targetPort: 27017
   selector:
     component: database
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: litmusportal-backend
+  namespace: ishangupta-ds
+  labels:
+    component: litmusportal-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: litmusportal-backend
+  template:
+    metadata:
+      labels:
+        component: litmusportal-backend
+    spec:
+      containers:
+        - name: litmusportal-backend
+          image: litmuschaos/litmusportal-frontend:ci
+          resources:
+            limits:
+              cpu: 100m
+              memory: 200Mi
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: litmusportal-backend-service
+  namespace: ishangupta-ds
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 9091
+      targetPort: 80
+  selector:
+    component: litmusportal-backend
