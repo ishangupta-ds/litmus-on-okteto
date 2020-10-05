@@ -43,6 +43,8 @@ kind: Service
 metadata:
   name: litmusportal-frontend-service
   namespace: ishangupta-ds
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
 spec:
   type: NodePort
   ports:
@@ -270,6 +272,8 @@ kind: Service
 metadata:
   name: litmusportal-server-service
   namespace: ishangupta-ds
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
 spec:
   type: ClusterIP
   ports:
