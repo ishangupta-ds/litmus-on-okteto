@@ -1,6 +1,6 @@
 # Chaos Engineering with Litmus and Okteto Cloud
 
-[![Develop on Okteto](https://okteto.com/develop-okteto.svg)](https://cloud.okteto.com/deploy?repository=https://github.com/ishangupta-ds/litmus-on-okteto)
+[![Develop on Okteto](https://okteto.com/develop-okteto.svg)](https://cloud.okteto.com/deploy)
 
 This example shows how to do Chaos Engineering with Litmus and Okteto Cloud.
 
