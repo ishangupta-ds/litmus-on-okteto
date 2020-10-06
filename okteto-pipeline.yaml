@@ -1,5 +1,5 @@
 icon: https://raw.githubusercontent.com/litmuschaos/icons/master/litmus.png
 deploy:
   - kubectl apply -f sample-app2.yml
-  - envsubst < last.yaml > k8s.yaml
-  - kubectl apply -f k8s.yaml
+  - envsubst < last.yml > k8s.yml
+  - kubectl apply -f k8s.yml
